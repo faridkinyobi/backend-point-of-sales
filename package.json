@@ -19,7 +19,9 @@
   "devDependencies": {
     "@swc-node/register": "^1.10.9",
     "@swc/core": "^1.7.40",
+    "@types/cookie-parser": "^1.4.8",
     "@types/express": "^5.0.0",
+    "@types/morgan": "^1.9.9",
     "@types/node": "^20.3.1",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
@@ -34,6 +36,10 @@
   },
   "dependencies": {
     "@prisma/client": "^6.5.0",
-    "express": "^5.1.0"
+    "@types/cors": "^2.8.17",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "morgan": "^1.10.0"
   }
 }
