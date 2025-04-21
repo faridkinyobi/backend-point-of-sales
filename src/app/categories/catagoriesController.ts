@@ -8,7 +8,7 @@ export const getCategories = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const result = await categorisService.getAll();
+  const result = await categorisService.getAllData();
   if (result instanceof AppError) {
     next(result);
     return;
@@ -24,7 +24,7 @@ export const postCategories = async (
 ) => {
   const { body } = req;
 
-  const result = await categorisService.creat(body);
+  const result = await categorisService.creatData(body);
   if (result instanceof AppError) {
     next(result);
     return;
@@ -34,6 +34,7 @@ export const postCategories = async (
     data: result,
   });
 };
+
 // get id
 export const getByIdCategories = async (
   req: Request,
@@ -41,13 +42,14 @@ export const getByIdCategories = async (
   next: NextFunction,
 ) => {
   const { id } = req.params;
-  const result = await categorisService.getfindId(id);
+  const result = await categorisService.getDataById(id);
   if (result instanceof AppError) {
     next(result);
     return;
   }
   res.status(200).json({ success: true, data: result });
 };
+
 // delet
 export const deleteCategories = async (
   req: Request,
@@ -56,13 +58,14 @@ export const deleteCategories = async (
 ) => {
   const { id } = req.params;
 
-  const result = await categorisService.destory(id);
+  const result = await categorisService.deletesData(id);
   if (result instanceof AppError) {
     next(result);
     return;
   }
   res.status(200).json({ success: true, data: result });
 };
+
 // update
 export const updateCategories = async (
   req: Request,
@@ -71,7 +74,7 @@ export const updateCategories = async (
 ) => {
   const { id } = req.params;
   const { body } = req;
-  const result = await categorisService.update(id, body);
+  const result = await categorisService.updatesData(id, body);
   if (result instanceof AppError) {
     next(result);
     return;
