@@ -55,3 +55,8 @@ export interface ApiResponse<T> {
     message: string;
   };
 }
+export interface QueryParams {
+  search?: string;
+  page?: string;
+  perPage?: string;
+}
