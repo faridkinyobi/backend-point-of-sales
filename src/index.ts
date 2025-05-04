@@ -5,12 +5,13 @@ import cors from 'cors';
 import morgan from 'morgan';
 import routes from './routes/index';
 import { handlerErrorMiddleware } from './middleware';
+import { db } from './utils';
+import config from './config';
 
 const app = express();
 
-const PORT = process.env.PORT || 3000;
-const HOST = process.env.HOST || 'http://localhost';
-
+const PORT = config.port;
+const HOST = config.host;
 
 app.use(cors());
 app.use(morgan('dev'));
@@ -25,6 +26,14 @@ app.listen(PORT, () => {
 
 app.get('/', (req, res) => {
   res.send('wellcome');
+  db.$connect()
+    .then(() => {
+      res.send('Database connected');
+      console.log('Database connected');
+    })
+    .catch(() => {
+      res.send('Failed to connect to the database');
+    });
 });
 app.use(routes);
 
