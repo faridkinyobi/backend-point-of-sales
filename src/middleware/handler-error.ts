@@ -10,6 +10,11 @@ import {
 } from '@prisma/client/runtime/library';
 import { handlePrismaError } from 'src/utils';
 import { ERROR_CODE, type ErrorCode, type ApiResponse } from 'src/interface';
+import {
+  JsonWebTokenError,
+  TokenExpiredError,
+  NotBeforeError,
+} from 'jsonwebtoken';
 
 export const response = (
   code?: ErrorCode | number,
@@ -29,12 +34,11 @@ export const handlerErrorMiddleware: ErrorRequestHandler = (
   res: Response,
   next: NextFunction,
 ) => {
-  // console.log(err);
   if (err instanceof AppError) {
     res.status(err.httpStatus).json(response(err.code, err.message));
     return;
   }
- 
+
   // prisma handle error
   if (err instanceof PrismaClientKnownRequestError) {
     const errorMessage: string = `${err.code} - ${handlePrismaError(err)}`;
@@ -43,6 +47,7 @@ export const handlerErrorMiddleware: ErrorRequestHandler = (
       .json(response(ERROR_CODE.BAD_REQUEST.code, errorMessage));
     return;
   }
+
   // json validate
   if (
     err instanceof SyntaxError &&
@@ -57,7 +62,21 @@ export const handlerErrorMiddleware: ErrorRequestHandler = (
       );
     return;
   }
-  // console.error(next());
+
+  // jwt error / token expired / belum aktif / invalid.
+  if (err instanceof TokenExpiredError || err instanceof NotBeforeError) {
+    res
+      .status(ERROR_CODE.UNAUTHORIZED.httpStatus)
+      .json(response(ERROR_CODE.UNAUTHORIZED.code, err.message));
+  }
+
+  if (err instanceof JsonWebTokenError) {
+    res
+      .status(ERROR_CODE.UNAUTHORIZED.httpStatus)
+      .json(response(ERROR_CODE.UNAUTHORIZED.code, 'Authentication invalid'));
+    return;
+  }
+
   res
     .status(ERROR_CODE.INTERNAL_SERVER_ERROR.httpStatus)
     .json(response(ERROR_CODE.INTERNAL_SERVER_ERROR.code));
@@ -70,9 +89,6 @@ export class AppError extends Error {
   constructor(errorCode: ErrorCode, customMessage?: string) {
     const { message, code, httpStatus } = ERROR_CODE[errorCode];
     super(customMessage ?? message);
-    console.log(
-      `appError: {"message": "${message}", "code": "${code}", "httpStatus": ${httpStatus}}`,
-    );
     this.code = code;
     this.httpStatus = httpStatus;
 
